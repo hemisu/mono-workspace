@@ -1,0 +1,37 @@
+@top Program {
+  Message { (DateTime ( Info | Warning | Error ) element+) } *
+}
+
+@skip { whitespace | LineComment | BlockComment }
+
+
+element {
+  String |
+  Number |
+  ErrorMsg |
+  Identifier
+}
+
+@tokens {
+  whitespace { $[ \t\n\r]+ }
+  LineComment { "-""-" ![\n]* }
+  DateTime { $[0-9]+ "-" $[0-9]+ "-" $[0-9]+ " " $[0-9]+ ":" $[0-9]+ ":" $[0-9]+ "[GMT+" $[0-9]+ ":" $[0-9]+ "]" }
+  Info { "INFO" }
+  Warning { "WARNING" }
+  Error { "ERROR" }
+  ErrorMsg { "ERROR_MSG" }
+  Number { @digit + }
+  String { '"' (!["\\] | "\\" _)* '"' }
+  @precedence { DateTime, Number, ErrorMsg, Error }
+}
+
+@external tokens otherTokens from "./tokens" {
+  Identifier
+  BlockComment
+  Bool
+  Type
+  Keyword
+  Null
+  Builtin
+}
+
